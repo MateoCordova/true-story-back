@@ -82,7 +82,7 @@ async def verify_world_id(data: VerificationRequest):
 
 @app.get("/")
 def hello():
-    return "Hola mundo v3"
+    return "Hola mundo v4"
 
 @app.get("/ping-mongo")
 def ping_mongo():
