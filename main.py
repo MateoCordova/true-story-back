@@ -10,7 +10,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://my-node-frontend.azurewebsites.net"],
+    allow_origins=["https://2327-190-9-183-30.ngrok-free.app/","http://localhost:4200/"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
