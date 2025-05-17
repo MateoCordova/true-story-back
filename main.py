@@ -4,6 +4,14 @@ import requests
 import os
 from dotenv import load_dotenv
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://2327-190-9-183-30.ngrok-free.app/","http://localhost:4200/"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 load_dotenv()
 
 app = FastAPI()
@@ -49,4 +57,4 @@ def verify_world_id(data: VerificationRequest):
 
 @app.get("/")
 def hello():
-    return "Hola mundo"
+    return "Hola mundo v2"
