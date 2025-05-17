@@ -41,7 +41,7 @@ class VerificationRequest(BaseModel):
     signal: str
     usr: str
 
-class Permissions():
+class Permissions(BaseModel):
     notifications: bool
     contacts: bool
 
@@ -104,6 +104,8 @@ def auth(data : AuthRequest):
     #guardar usr en database
     access_token = create_access_token(data=data)
     return {"access_token": access_token, "token_type": "bearer"}
+
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
