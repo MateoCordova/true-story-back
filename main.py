@@ -24,7 +24,7 @@ app = FastAPI()
 WORLD_ID_API_KEY = os.getenv("WORLD_ID_API_KEY")
 
 # URL del endpoint de verificación de World ID
-WORLD_ID_VERIFY_URL = "https://developer.worldcoin.org/api/v1/verify/production"
+WORLD_ID_VERIFY_URL = "https://developer.worldcoin.org/api/v1/verify/{WORLD_ID_API_KEY}/"
 
 # Modelo de datos para la solicitud
 class VerificationRequest(BaseModel):
