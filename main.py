@@ -102,8 +102,14 @@ def get_nonce():
 @app.post("/auth")
 def auth(data : AuthRequest):
     validateNounce(data.nonce)
+    newdict = {
+        "username":data.username,
+        "walletAddress":data.walletAddress,
+        "profilepic":data.profilePictureUrl,
+        "exp":""
+        }
     #guardar usr en database
-    access_token = create_access_token(data=data)
+    access_token = create_access_token(data=newdict)
     return {"access_token": access_token, "token_type": "bearer"}
 
 
