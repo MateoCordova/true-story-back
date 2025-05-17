@@ -1,15 +1,18 @@
 import uvicorn
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel
+from typing import Optional, Union, Tuple, List
 import requests
 import os
 from dotenv import load_dotenv
-from dbconn import db
+from db import db
 from session import *
-from typing import Optional
-from models import *
-
+from models import VerificationRequest , AuthRequest, User, Post
+import asyncio
+from beanie import init_beanie
 from fastapi.middleware.cors import CORSMiddleware
+from pymongo import GEOSPHERE
+
 
 app = FastAPI()
 
@@ -59,7 +62,7 @@ async def verify_world_id(data: VerificationRequest):
 
 @app.get("/")
 def hello():
-    return "Hola mundo v4"
+    return "Hola mundo v5"
 
 @app.get("/ping-mongo")
 async def ping_mongo():
@@ -88,7 +91,33 @@ def auth(data : AuthRequest):
     access_token = create_access_token(data=newdict)
     return {"access_token": access_token, "token_type": "bearer"}
 
+@app.get("/posts/cercanos", response_model=List[Post])
+async def obtener_posts_cercanos(
+    lat: float = Query(..., description="Latitud"),
+    lon: float = Query(..., description="Longitud"),
+    max_results: int = 10
+):
+    await init_beanie(database=db,document_models=[User, Post])
+    pipeline = [
+        {
+            "$geoNear": {
+                "near": {"type": "Point", "coordinates": [lon, lat]},
+                "distanceField": "distancia",
+                "spherical": True
+            }
+        },
+        {
+            "$limit": max_results
+        }
+    ]
 
+    # Ejecutar la agregación sobre la colección
+    cursor = db["posts"].aggregate(pipeline)
+    results = []
+    async for doc in cursor:
+        results.append(Post(**doc))  # reconstruye como objetos Beanie
+    return results
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
+    

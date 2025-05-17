@@ -2,11 +2,9 @@ from fastapi import FastAPI, Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from datetime import datetime, timedelta, timezone
-from pydantic import BaseModel
 import random
 import string
 import time
-import models
 
 nonces_store = {}
 
