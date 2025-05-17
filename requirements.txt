@@ -4,3 +4,5 @@ requests
 python-dotenv
 pymongo[srv]
 python-jose
+beanie 
+motor

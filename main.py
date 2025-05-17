@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from dbconn import db
 from session import *
 from typing import Optional
+from models import *
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -31,31 +32,6 @@ ConnectionString = os.getenv("mongoDB")
 
 # URL del endpoint de verificación de World ID
 WORLD_ID_VERIFY_URL = "https://developer.worldcoin.org/api/v2/verify/"+str(WORLD_ID_API_KEY)
-
-# Modelo de datos para la solicitud
-class VerificationRequest(BaseModel):
-    merkle_root: str
-    nullifier_hash: str
-    proof: str
-    credential_type: str
-    action: str
-    signal: str
-    usr: str
-
-class Permission(BaseModel):
-    notifications: bool
-    contacts: bool
-
-
-class AuthRequest(BaseModel):
-    walletAddress: str | None
-    username: str | None
-    profilePictureUrl: str | None
-    #permissions:  Optional[Permission] = None  Bug pendiente :c
-    optedIntoOptionalAnalytics: bool | None
-    worldAppVersion : float | None
-    deviceOS: str
-    nonce: str
 
 @app.post("/verify-world-id")
 async def verify_world_id(data: VerificationRequest):
@@ -86,9 +62,9 @@ def hello():
     return "Hola mundo v4"
 
 @app.get("/ping-mongo")
-def ping_mongo():
+async def ping_mongo():
     try:
-        db.command("ping")
+        await db.command("ping")
         return {"status": "Mongo conectado"}
     except Exception as e:
         return {"error": str(e)}

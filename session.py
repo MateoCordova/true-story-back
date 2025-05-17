@@ -6,6 +6,7 @@ from pydantic import BaseModel
 import random
 import string
 import time
+import models
 
 nonces_store = {}
 
@@ -15,20 +16,6 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-    
-
-class TokenData(BaseModel):
-    username: str | None = None
-
-class User(BaseModel):
-    username: str
-    walletAddress: str
-    profilepic: str | None
-    exp: str | None
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
