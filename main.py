@@ -6,6 +6,7 @@ import os
 from dotenv import load_dotenv
 from dbconn import db
 from session import *
+from typing import Optional
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -41,7 +42,7 @@ class VerificationRequest(BaseModel):
     signal: str
     usr: str
 
-class Permissions(BaseModel):
+class Permission(BaseModel):
     notifications: bool
     contacts: bool
 
@@ -50,11 +51,11 @@ class AuthRequest(BaseModel):
     walletAddress: str | None
     username: str | None
     profilePictureUrl: str | None
-    permissions: Permissions | None
+    #permissions:  Optional[Permission] = None  Bug pendiente :c
     optedIntoOptionalAnalytics: bool | None
     worldAppVersion : float | None
     deviceOS: str
-    nonse: str
+    nonce: str
 
 @app.post("/verify-world-id")
 async def verify_world_id(data: VerificationRequest):
@@ -100,7 +101,7 @@ def get_nonce():
 
 @app.post("/auth")
 def auth(data : AuthRequest):
-    validateNounce(data.nonse)
+    validateNounce(data.nonce)
     #guardar usr en database
     access_token = create_access_token(data=data)
     return {"access_token": access_token, "token_type": "bearer"}
