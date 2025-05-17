@@ -16,7 +16,7 @@ class User(Document):  # Inherit from Document, not BaseModel
 class Post(Document):
     created_by: User
     created_at: datetime
-    media: Union[Image, Video]
+    media: List[str]
     etiquetas: List[str]
     georeference: Tuple[float, float]
     titulo: str

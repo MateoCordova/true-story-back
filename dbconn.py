@@ -1,7 +1,7 @@
 import os
 from motor.motor_asyncio import AsyncIOMotorClient
 from beanie import init_beanie
-from DB.creacionesquemas import *  
+
 
 MONGODB_URI = os.getenv("mongoDB")
 
