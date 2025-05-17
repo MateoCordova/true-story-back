@@ -5,6 +5,9 @@ from datetime import datetime, timedelta
 from pydantic import BaseModel
 import random
 import string
+import time
+
+nonces_store = {}
 
 # Clave secreta para firmar el JWT
 SECRET_KEY = "Simbatelacomes"
@@ -32,3 +35,11 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
 def generate_nonce(length: int = 8) -> str:
     characters = string.ascii_letters + string.digits
     return ''.join(random.choices(characters, k=length))
+
+def validateNounce(nonce: str):
+    if nonce not in nonces_store:
+        raise HTTPException(status_code=400, detail="Nonce inválido")
+    if time.time() - nonces_store[nonce] > 300:
+        del nonces_store[nonce]
+        raise HTTPException(status_code=400, detail="Nonce inválido")
+    del nonces_store[nonce]

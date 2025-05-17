@@ -41,6 +41,21 @@ class VerificationRequest(BaseModel):
     signal: str
     usr: str
 
+class Permissions():
+    notifications: bool
+    contacts: bool
+
+
+class AuthRequest(BaseModel):
+    walletAddress: str | None
+    username: str | None
+    profilePictureUrl: str | None
+    permissions: Permissions | None
+    optedIntoOptionalAnalytics: bool | None
+    worldAppVersion : float | None
+    deviceOS: str
+    nonse: str
+
 @app.post("/verify-world-id")
 async def verify_world_id(data: VerificationRequest):
     headers = {
@@ -80,7 +95,15 @@ def ping_mongo():
 @app.get("/nonce")
 def get_nonce():
     nonce = generate_nonce()
+    nonces_store[nonce] = time.time()
     return {"nonce": nonce}
+
+@app.post("/auth")
+def auth(data : AuthRequest):
+    validateNounce(data.nonse)
+    #guardar usr en database
+    access_token = create_access_token(data=data)
+    return {"access_token": access_token, "token_type": "bearer"}
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
