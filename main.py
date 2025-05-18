@@ -81,6 +81,12 @@ def get_nonce():
     nonces_store[nonce] = time.time()
     return {"nonce": nonce}
 
+@app.get("/uuid")
+def get_nonce():
+    myuuid = generate_uuid(40)
+    myuuid_store[myuuid] = time.time()
+    return {"id": myuuid}
+
 @app.post("/auth")
 async def auth(data : AuthRequest):
     validateNounce(data.nonce)

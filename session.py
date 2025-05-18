@@ -5,11 +5,13 @@ from datetime import datetime, timedelta, timezone
 import random
 import string
 import time
+import uuid
 
 nonces_store = {}
+myuuid_store = {}
 
 # Clave secreta para firmar el JWT
-SECRET_KEY = "Simbatelacomes"
+SECRET_KEY = "ARCANE-MAGIC"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -24,6 +26,11 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
 def generate_nonce(length: int = 8) -> str:
     characters = string.ascii_letters + string.digits
     return ''.join(random.choices(characters, k=length))
+    
+def generate_uuid() -> str:
+    myuuid = uuid.uuid4()
+    myuuid = str(myuuid).replace("-","")
+    return myuuid
 
 def validateNounce(nonce: str):
     if nonce not in nonces_store:
