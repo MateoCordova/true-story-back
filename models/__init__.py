@@ -6,5 +6,6 @@ from .userRequest import UserRequest
 from .verificationRequest import VerificationRequest
 from .authRequest import AuthRequest
 from .postCreate import PostCreate
+from .postDestacar import PostDestacar
 
 

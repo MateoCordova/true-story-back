@@ -11,6 +11,7 @@ class Post(Document):
     etiquetas: List[str] | None
     georeference: GeoPoint
     titulo: str
+    destacado : bool
 
     class Settings:
         name = "posts"  # Nombre de la colección

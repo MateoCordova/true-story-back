@@ -7,11 +7,14 @@ import os
 from dotenv import load_dotenv
 from db import db
 from session import *
-from models import VerificationRequest , AuthRequest, User, Post, PostCreate
+from models import VerificationRequest , AuthRequest, User, Post, PostCreate, PostDestacar
 import asyncio
 from beanie import init_beanie
 from fastapi.middleware.cors import CORSMiddleware
 from pymongo import GEOSPHERE
+import threading
+from integraciones import *
+from bson import ObjectId
 
 
 app = FastAPI()
@@ -88,11 +91,13 @@ async def auth(data : AuthRequest):
         "exp":""
         }
     await init_beanie(database=db,document_models=[User, Post])
-    newuser = User(username=data.username, walletAddress=data.walletAddress, profilepic=data.profilePictureUrl)
-    try:
-        await User.insert_one(newuser)
-    except:
-        print("El usuario ya existe")
+    usuario = await User.find_one(User.walletAddress == data.walletAddress)
+    if usuario is None:
+        newuser = User(username=data.username, walletAddress=data.walletAddress, profilepic=data.profilePictureUrl)
+        try:
+            await User.insert_one(newuser)
+        except:
+            print("El usuario ya existe")
     access_token = create_access_token(data=newdict)
     return {"access_token": access_token, "token_type": "bearer"}
 
@@ -141,11 +146,33 @@ async def crear_post(post_data: PostCreate, token: str = Depends(oauth2_scheme))
         etiquetas=post_data.etiquetas,
         georeference=post_data.georeference,
         titulo=post_data.titulo,
-        categoria=post_data.categoria
+        categoria=post_data.categoria,
+        destacado=False,
     )
 
-    await nuevo_post.insert()
-    return {"message": "Post creado", "post_id": str(nuevo_post.id)}
+@app.post("/post/destacar/{post_id}", status_code=201)
+async def crear_post(post_id: str, token: str = Depends(oauth2_scheme)):
+    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    walletAddress: str = payload.get("walletAddress")
+    if walletAddress is None:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    await init_beanie(database=db,document_models=[User, Post])
+    try:
+        obj_id = ObjectId(post_id)
+    except:
+        raise HTTPException(status_code=400, detail="ID inválido")
+    #Completa esta parte, busca el usuario por wallet
+    usuarioComprador = await User.find_one(User.walletAddress == walletAddress)
+    postTarget = await Post.get(obj_id)
+    if not postTarget:
+        raise HTTPException(status_code=404, detail="Post no encontrado")
+    if usuarioComprador.walletAddress is None:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    
+    setattr(postTarget, "destacado", True)
+
+    await postTarget.save()
+    return {"message": "Post actualizado", "post": postTarget}
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)

@@ -36,7 +36,8 @@ async def create_posts(users):
             etiquetas=["ecuador", "ejido"],
             georeference=GeoPoint(coordinates=lugares["Granados"]),
             titulo="Post 1 en El Ejido",
-            categoria="Movilidad"
+            categoria="Movilidad",
+            destacado=False,
         ),
         Post(
             created_by=users[1],
@@ -45,7 +46,8 @@ async def create_posts(users):
             etiquetas=["urbano", "mariscal"],
             georeference=GeoPoint(coordinates=lugares["Granados"]),
             titulo="Post 2 en La Mariscal",
-            categoria="Cultural"
+            categoria="Cultural",
+            destacado=False,
         ),
         Post(
             created_by=users[2],
@@ -54,7 +56,8 @@ async def create_posts(users):
             etiquetas=["parque", "carolina"],
             georeference=GeoPoint(coordinates=lugares["Granados"]),
             titulo="Post 3 en La Carolina",
-            categoria="Ocio"
+            categoria="Ocio",
+            destacado=False,
         ),
         Post(
             created_by=users[0],
@@ -63,7 +66,8 @@ async def create_posts(users):
             etiquetas=["historia", "san_roque"],
             georeference=GeoPoint(coordinates=lugares["Granados"]),
             titulo="Post 4 en San Roque",
-            categoria="Cultural"
+            categoria="Cultural",
+            destacado=False
         ),
         Post(
             created_by=users[1],
@@ -72,7 +76,8 @@ async def create_posts(users):
             etiquetas=["ejido", "foto"],
             georeference=GeoPoint(coordinates=lugares["Granados"]),
             titulo="Post 5 en El Ejido",
-            categoria="Social"
+            categoria="Social",
+            destacado=False,
         ),
         Post(
             created_by=users[2],
@@ -81,7 +86,8 @@ async def create_posts(users):
             etiquetas=["mariscal", "cultura"],
             georeference=GeoPoint(coordinates=lugares["Granados"]),
             titulo="Post 6 en La Mariscal",
-            categoria="Educativo"
+            categoria="Educativo",
+            destacado=False,
         ),
         Post(
             created_by=users[0],
@@ -90,7 +96,8 @@ async def create_posts(users):
             etiquetas=["carolina", "vista"],
             georeference=GeoPoint(coordinates=lugares["Granados"]),
             titulo="Post 7 en La Carolina",
-            categoria="Deportivo"
+            categoria="Deportivo",
+            destacado=False,
         ),
         Post(
             created_by=users[1],
@@ -99,7 +106,8 @@ async def create_posts(users):
             etiquetas=["mercado", "san_roque"],
             georeference=GeoPoint(coordinates=lugares["Granados"]),
             titulo="Post 8 en San Roque",
-            categoria="Ofertas"
+            categoria="Ofertas",
+            destacado=False,
         ),
         Post(
             created_by=users[2],
@@ -108,7 +116,8 @@ async def create_posts(users):
             etiquetas=["ejido", "día"],
             georeference=GeoPoint(coordinates=lugares["Granados"]),
             titulo="Post 9 en El Ejido",
-            categoria="Tránsito"
+            categoria="Tránsito",
+            destacado=False,
         ),
         Post(
             created_by=users[0],
@@ -117,53 +126,9 @@ async def create_posts(users):
             etiquetas=["mariscal", "mural"],
             georeference=GeoPoint(coordinates=lugares["Granados"]),
             titulo="Post 10 en La Mariscal",
-            categoria="Cultural"
-        ),
-        Post(
-            created_by=users[1],
-            created_at=datetime.now(timezone.utc),
-            media=Image(filename="foto_11.png", mime_type="image/png", data_base64=SAMPLE_IMAGE_BASE64),
-            etiquetas=["deporte", "carolina"],
-            georeference=GeoPoint(coordinates=lugares["Granados"]),
-            titulo="Post 11 en La Carolina",
-            categoria="Ocio"
-        ),
-        Post(
-            created_by=users[2],
-            created_at=datetime.now(timezone.utc),
-            media=Image(filename="foto_12.png", mime_type="image/png", data_base64=SAMPLE_IMAGE_BASE64),
-            etiquetas=["calle", "san_roque"],
-            georeference=GeoPoint(coordinates=lugares["Granados"]),
-            titulo="Post 12 en San Roque",
-            categoria="Social"
-        ),
-        Post(
-            created_by=users[0],
-            created_at=datetime.now(timezone.utc),
-            media=Image(filename="foto_13.png", mime_type="image/png", data_base64=SAMPLE_IMAGE_BASE64),
-            etiquetas=["ejido", "cielo"],
-            georeference=GeoPoint(coordinates=lugares["Granados"]),
-            titulo="Post 13 en El Ejido",
-            categoria="Ocio"
-        ),
-        Post(
-            created_by=users[1],
-            created_at=datetime.now(timezone.utc),
-            media=Image(filename="foto_14.png", mime_type="image/png", data_base64=SAMPLE_IMAGE_BASE64),
-            etiquetas=["mariscal", "noche"],
-            georeference=GeoPoint(coordinates=lugares["Granados"]),
-            titulo="Post 14 en La Mariscal",
-            categoria="Ofertas"
-        ),
-        Post(
-            created_by=users[2],
-            created_at=datetime.now(timezone.utc),
-            media=Image(filename="foto_15.png", mime_type="image/png", data_base64=SAMPLE_IMAGE_BASE64),
-            etiquetas=["carolina", "familia"],
-            georeference=GeoPoint(coordinates=lugares["Granados"]),
-            titulo="Post 15 en La Carolina",
-            categoria="Académico"
-        ),
+            categoria="Cultural",
+            destacado=False,
+        )
     ]
 
     await Post.insert_many(posts)
