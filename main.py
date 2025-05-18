@@ -96,7 +96,7 @@ async def auth(data : AuthRequest):
     access_token = create_access_token(data=newdict)
     return {"access_token": access_token, "token_type": "bearer"}
 
-@app.post("/posts/cercanos", response_model=List[Post])
+@app.get("/posts/cercanos", response_model=List[Post])
 async def obtener_posts_cercanos(
     lat: float = Query(..., description="Latitud"),
     lon: float = Query(..., description="Longitud"),
