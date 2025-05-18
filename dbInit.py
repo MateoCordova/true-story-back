@@ -9,22 +9,24 @@ from datetime import datetime, timezone
 import base64
 from pymongo import GEOSPHERE
 import os
+import mimetypes
 
 # Ruta a la carpeta con las imágenes
 folder_path = "images"
 
-# Diccionario para guardar los resultados
-images_base64 = {}
+images_data = []
 
-# Recorremos todos los archivos en la carpeta
 for filename in os.listdir(folder_path):
     file_path = os.path.join(folder_path, filename)
     
-    # Asegurarse de que sea un archivo (y no una subcarpeta, por ejemplo)
     if os.path.isfile(file_path):
+        # Detectar el MIME type
+        mime_type, _ = mimetypes.guess_type(file_path)
+        
+        # Leer y codificar en base64
         with open(file_path, "rb") as image_file:
             encoded_string = base64.b64encode(image_file.read()).decode("utf-8")
-            images_base64[filename] = encoded_string
+            images_data.append((filename, mime_type, encoded_string))
 
 
 lugares = {
@@ -54,100 +56,100 @@ async def create_posts(users):
         Post(
             created_by=users[0],
             created_at=datetime.now(timezone.utc),
-            media=Image(filename="foto_1.png", mime_type="image/png", data_base64=SAMPLE_IMAGE_BASE64),
-            etiquetas=["ecuador", "ejido"],
-            georeference=GeoPoint(coordinates=lugares["Granados"]),
-            titulo="Post 1 en El Ejido",
+            media=Image(filename=images_data[0][0], mime_type=images_data[0][1], data_base64=images_data[0][2]),
+            etiquetas=["Urgente", "Accidente"],
+            georeference=GeoPoint(coordinates=lugares["1"]),
+            titulo="Accidente en Guayabamba",
             categoria="Movilidad",
             destacado=False,
         ),
         Post(
             created_by=users[1],
             created_at=datetime.now(timezone.utc),
-            media=Image(filename="foto_2.png", mime_type="image/png", data_base64=SAMPLE_IMAGE_BASE64),
-            etiquetas=["urbano", "mariscal"],
-            georeference=GeoPoint(coordinates=lugares["Granados"]),
-            titulo="Post 2 en La Mariscal",
+            media=Image(filename=images_data[1][0], mime_type=images_data[1][1], data_base64=images_data[1][2]),
+            etiquetas=["comida", "asado", "internacional"],
+            georeference=GeoPoint(coordinates=lugares["2"]),
+            titulo="Locos por el asado",
             categoria="Cultural",
             destacado=False,
         ),
         Post(
             created_by=users[2],
             created_at=datetime.now(timezone.utc),
-            media=Image(filename="foto_3.png", mime_type="image/png", data_base64=SAMPLE_IMAGE_BASE64),
-            etiquetas=["parque", "carolina"],
-            georeference=GeoPoint(coordinates=lugares["Granados"]),
-            titulo="Post 3 en La Carolina",
-            categoria="Ocio",
+            media=Image(filename=images_data[2][0], mime_type=images_data[2][1], data_base64=images_data[2][2]),
+            etiquetas=["Primax", "Asalto"],
+            georeference=GeoPoint(coordinates=lugares["3"]),
+            titulo="Asato en Primax Norte",
+            categoria="Seguridad",
             destacado=False,
         ),
         Post(
             created_by=users[0],
             created_at=datetime.now(timezone.utc),
-            media=Image(filename="foto_4.png", mime_type="image/png", data_base64=SAMPLE_IMAGE_BASE64),
-            etiquetas=["historia", "san_roque"],
-            georeference=GeoPoint(coordinates=lugares["Granados"]),
-            titulo="Post 4 en San Roque",
+            media=Image(filename=images_data[3][0], mime_type=images_data[3][1], data_base64=images_data[3][2]),
+            etiquetas=["Vias", "Invierno"],
+            georeference=GeoPoint(coordinates=lugares["4"]),
+            titulo="Bache Grande en Diego de Almagro",
             categoria="Cultural",
             destacado=False
         ),
         Post(
             created_by=users[1],
             created_at=datetime.now(timezone.utc),
-            media=Image(filename="foto_5.png", mime_type="image/png", data_base64=SAMPLE_IMAGE_BASE64),
-            etiquetas=["ejido", "foto"],
-            georeference=GeoPoint(coordinates=lugares["Granados"]),
-            titulo="Post 5 en El Ejido",
-            categoria="Social",
+            media=Image(filename=images_data[4][0], mime_type=images_data[4][1], data_base64=images_data[4][2]),
+            etiquetas=["musica", "concierto"],
+            georeference=GeoPoint(coordinates=lugares["5"]),
+            titulo="Coldplay Inmersivo",
+            categoria="Cultural",
             destacado=False,
         ),
         Post(
             created_by=users[2],
             created_at=datetime.now(timezone.utc),
-            media=Image(filename="foto_6.png", mime_type="image/png", data_base64=SAMPLE_IMAGE_BASE64),
-            etiquetas=["mariscal", "cultura"],
-            georeference=GeoPoint(coordinates=lugares["Granados"]),
-            titulo="Post 6 en La Mariscal",
-            categoria="Educativo",
+            media=Image(filename=images_data[5][0], mime_type=images_data[5][1], data_base64=images_data[5][2]),
+            etiquetas=["Vías"],
+            georeference=GeoPoint(coordinates=lugares["6"]),
+            titulo="Bache",
+            categoria="Movilidad",
             destacado=False,
         ),
         Post(
             created_by=users[0],
             created_at=datetime.now(timezone.utc),
-            media=Image(filename="foto_7.png", mime_type="image/png", data_base64=SAMPLE_IMAGE_BASE64),
-            etiquetas=["carolina", "vista"],
-            georeference=GeoPoint(coordinates=lugares["Granados"]),
-            titulo="Post 7 en La Carolina",
-            categoria="Deportivo",
+            media=Image(filename=images_data[6][0], mime_type=images_data[6][1], data_base64=images_data[6][2]),
+            etiquetas=["feminismo", "emprendimiento"],
+            georeference=GeoPoint(coordinates=lugares["7"]),
+            titulo="Conferencia Exponencialmente Conciente",
+            categoria="Cultural",
             destacado=False,
         ),
         Post(
             created_by=users[1],
             created_at=datetime.now(timezone.utc),
-            media=Image(filename="foto_8.png", mime_type="image/png", data_base64=SAMPLE_IMAGE_BASE64),
-            etiquetas=["mercado", "san_roque"],
-            georeference=GeoPoint(coordinates=lugares["Granados"]),
-            titulo="Post 8 en San Roque",
-            categoria="Ofertas",
+            media=Image(filename=images_data[7][0], mime_type=images_data[7][1], data_base64=images_data[7][2]),
+            etiquetas=["teatro", "CCi"],
+            georeference=GeoPoint(coordinates=lugares["8"]),
+            titulo="Terapia Integral",
+            categoria="Cultural",
             destacado=False,
         ),
         Post(
             created_by=users[2],
             created_at=datetime.now(timezone.utc),
-            media=Image(filename="foto_9.png", mime_type="image/png", data_base64=SAMPLE_IMAGE_BASE64),
-            etiquetas=["ejido", "día"],
-            georeference=GeoPoint(coordinates=lugares["Granados"]),
-            titulo="Post 9 en El Ejido",
+            media=Image(filename=images_data[8][0], mime_type=images_data[8][1], data_base64=images_data[8][2]),
+            etiquetas=["tecnología", "emprendimiento"],
+            georeference=GeoPoint(coordinates=lugares["9"]),
+            titulo="Cultural",
             categoria="Tránsito",
             destacado=False,
         ),
         Post(
             created_by=users[0],
             created_at=datetime.now(timezone.utc),
-            media=Image(filename="foto_10.png", mime_type="image/png", data_base64=SAMPLE_IMAGE_BASE64),
-            etiquetas=["mariscal", "mural"],
-            georeference=GeoPoint(coordinates=lugares["Granados"]),
-            titulo="Post 10 en La Mariscal",
+            media=Image(filename=images_data[9][0], mime_type=images_data[9][1], data_base64=images_data[9][2]),
+            etiquetas=["anime", "k-pop"],
+            georeference=GeoPoint(coordinates=lugares["10"]),
+            titulo="Budokan",
             categoria="Cultural",
             destacado=False,
         )
