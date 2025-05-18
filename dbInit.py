@@ -8,14 +8,36 @@ from random import random, choice, sample, uniform
 from datetime import datetime, timezone
 import base64
 from pymongo import GEOSPHERE
+import os
 
-SAMPLE_IMAGE_BASE64 = base64.b64encode(b"fake-image-bytes").decode("utf-8")
+# Ruta a la carpeta con las imágenes
+folder_path = "images"
+
+# Diccionario para guardar los resultados
+images_base64 = {}
+
+# Recorremos todos los archivos en la carpeta
+for filename in os.listdir(folder_path):
+    file_path = os.path.join(folder_path, filename)
+    
+    # Asegurarse de que sea un archivo (y no una subcarpeta, por ejemplo)
+    if os.path.isfile(file_path):
+        with open(file_path, "rb") as image_file:
+            encoded_string = base64.b64encode(image_file.read()).decode("utf-8")
+            images_base64[filename] = encoded_string
+
 
 lugares = {
-    "KrugerCorp":(-0.185154, -78.474481),
-    "Granados":(-0.166208, -78.469182),
-    "SimonBolivar":(-0.170558, -78.452818),
-    "CentroExposicionesQuito":(-0.181601, -78.486632)
+    "1":(-0.065627, -78.363725),
+    "2":(-0.199014, -78.434874),
+    "3":(-0.159903, -78.466768),
+    "4":(-0.192961, -78.482850),
+    "5":(-0.181316, -78.501607),
+    "6":(-0.157373, -78.479745),
+    "7":(-0.221672, -78.510597),
+    "8":(-0.176611, -78.485639),
+    "9":(-0.198576, -78.436376),
+    "10":(-0.181439, -78.486586)
 }
 
 async def create_users():

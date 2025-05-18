@@ -156,6 +156,8 @@ async def crear_post(post_data: PostCreate, token: str = Depends(oauth2_scheme))
         categoria=post_data.categoria,
         destacado=False,
     )
+    await nuevo_post.insert()
+    return {"message": "Post creado", "post_id": str(nuevo_post.id)}
 
 @app.post("/post/destacar/{post_id}", status_code=201)
 async def crear_post(post_id: str, payload : PayVerifyRequest):
