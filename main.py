@@ -83,7 +83,7 @@ def get_nonce():
 
 @app.get("/uuid")
 def get_nonce():
-    myuuid = generate_uuid(40)
+    myuuid = generate_uuid()
     myuuid_store[myuuid] = time.time()
     return {"id": myuuid}
 
