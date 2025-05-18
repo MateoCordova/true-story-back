@@ -135,10 +135,10 @@ async def obtener_posts_cercanos(
         results.append(Post(**doc))  # reconstruye como objetos Beanie
     return results
 
-@app.post("/post/crear", status_code=201)
-async def crear_post(post_data: PostCreate, token: str = Depends(oauth2_scheme)):
-    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-    walletAddress: str = payload.get("walletAddress")
+@app.post("/post/crear/{walletAddress}", status_code=201)
+async def crear_post(post_data: PostCreate, walletAddress: str, token: str = Depends(oauth2_scheme)):
+    #payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    #walletAddress: str = payload.get("walletAddress")
     if walletAddress is None:
         raise HTTPException(status_code=401, detail="Invalid token")
     await init_beanie(database=db,document_models=[User, Post])
