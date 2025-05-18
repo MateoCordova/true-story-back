@@ -7,7 +7,7 @@ import os
 from dotenv import load_dotenv
 from db import db
 from session import *
-from models import VerificationRequest , AuthRequest, User, Post
+from models import VerificationRequest , AuthRequest, User, Post, PostCreate
 import asyncio
 from beanie import init_beanie
 from fastapi.middleware.cors import CORSMiddleware
@@ -79,7 +79,7 @@ def get_nonce():
     return {"nonce": nonce}
 
 @app.post("/auth")
-def auth(data : AuthRequest):
+async def auth(data : AuthRequest):
     validateNounce(data.nonce)
     newdict = {
         "username":data.username,
@@ -87,11 +87,16 @@ def auth(data : AuthRequest):
         "profilepic":data.profilePictureUrl,
         "exp":""
         }
-    #guardar usr en database
+    await init_beanie(database=db,document_models=[User, Post])
+    newuser = User(username=data.username, walletAddress=data.walletAddress, profilepic=data.profilePictureUrl)
+    try:
+        await User.insert_one(newuser)
+    except:
+        print("El usuario ya existe")
     access_token = create_access_token(data=newdict)
     return {"access_token": access_token, "token_type": "bearer"}
 
-@app.get("/posts/cercanos", response_model=List[Post])
+@app.post("/posts/cercanos", response_model=List[Post])
 async def obtener_posts_cercanos(
     lat: float = Query(..., description="Latitud"),
     lon: float = Query(..., description="Longitud"),
@@ -117,6 +122,30 @@ async def obtener_posts_cercanos(
     async for doc in cursor:
         results.append(Post(**doc))  # reconstruye como objetos Beanie
     return results
+
+@app.post("/post/crear", status_code=201)
+async def crear_post(post_data: PostCreate, token: str = Depends(oauth2_scheme)):
+    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    walletAddress: str = payload.get("walletAddress")
+    if walletAddress is None:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    await init_beanie(database=db,document_models=[User, Post])
+    #Completa esta parte, busca el usuario por wallet
+    usuarioCreador = await User.find_one(User.walletAddress == walletAddress)
+    if usuarioCreador is None:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    nuevo_post = Post(
+        created_by=usuarioCreador,
+        created_at=datetime.now(timezone.utc),
+        media=post_data.media,
+        etiquetas=post_data.etiquetas,
+        georeference=post_data.georeference,
+        titulo=post_data.titulo,
+        categoria=post_data.categoria
+    )
+
+    await nuevo_post.insert()
+    return {"message": "Post creado", "post_id": str(nuevo_post.id)}
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)

@@ -8,7 +8,7 @@ class Post(Document):
     created_at: datetime
     media: Union[Image, Video]
     categoria: str
-    etiquetas: List[str]
+    etiquetas: List[str] | None
     georeference: GeoPoint
     titulo: str
 
