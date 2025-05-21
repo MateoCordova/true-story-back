@@ -8,5 +8,7 @@ from .authRequest import AuthRequest
 from .postCreate import PostCreate
 from .postDestacar import PostDestacar
 from .payverifyRequest import PayVerifyRequest
+from .mediaDB import Media
+
 
 

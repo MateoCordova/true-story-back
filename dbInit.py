@@ -3,16 +3,21 @@ from beanie import init_beanie
 import asyncio
 from motor.motor_asyncio import AsyncIOMotorClient
 from db import db
-from models import User, Post, Image, GeoPoint
+from models import User, Post, Image, GeoPoint, Media
 from random import random, choice, sample, uniform
 from datetime import datetime, timezone
 import base64
 from pymongo import GEOSPHERE
 import os
 import mimetypes
+from io import BytesIO
 
 # Ruta a la carpeta con las imágenes
 folder_path = "images"
+
+# Compression settings
+JPEG_QUALITY = 60  # from 1 (worst) to 95 (best)
+MAX_WIDTH = 800     # Resize if wider than this
 
 images_data = []
 
@@ -56,7 +61,6 @@ async def create_posts(users):
         Post(
             created_by=users[0],
             created_at=datetime.now(timezone.utc),
-            media=Image(filename=images_data[0][0], mime_type=images_data[0][1], data_base64=images_data[0][2]),
             etiquetas=["Urgente", "Accidente"],
             georeference=GeoPoint(coordinates=lugares["1"]),
             titulo="Accidente en Guayabamba",
@@ -66,7 +70,6 @@ async def create_posts(users):
         Post(
             created_by=users[1],
             created_at=datetime.now(timezone.utc),
-            media=Image(filename=images_data[1][0], mime_type=images_data[1][1], data_base64=images_data[1][2]),
             etiquetas=["comida", "asado", "internacional"],
             georeference=GeoPoint(coordinates=lugares["2"]),
             titulo="Locos por el asado",
@@ -76,7 +79,6 @@ async def create_posts(users):
         Post(
             created_by=users[2],
             created_at=datetime.now(timezone.utc),
-            media=Image(filename=images_data[2][0], mime_type=images_data[2][1], data_base64=images_data[2][2]),
             etiquetas=["Primax", "Asalto"],
             georeference=GeoPoint(coordinates=lugares["3"]),
             titulo="Asato en Primax Norte",
@@ -86,7 +88,6 @@ async def create_posts(users):
         Post(
             created_by=users[0],
             created_at=datetime.now(timezone.utc),
-            media=Image(filename=images_data[3][0], mime_type=images_data[3][1], data_base64=images_data[3][2]),
             etiquetas=["Vias", "Invierno"],
             georeference=GeoPoint(coordinates=lugares["4"]),
             titulo="Bache Grande en Diego de Almagro",
@@ -96,7 +97,6 @@ async def create_posts(users):
         Post(
             created_by=users[1],
             created_at=datetime.now(timezone.utc),
-            media=Image(filename=images_data[4][0], mime_type=images_data[4][1], data_base64=images_data[4][2]),
             etiquetas=["musica", "concierto"],
             georeference=GeoPoint(coordinates=lugares["5"]),
             titulo="Coldplay Inmersivo",
@@ -106,7 +106,6 @@ async def create_posts(users):
         Post(
             created_by=users[2],
             created_at=datetime.now(timezone.utc),
-            media=Image(filename=images_data[5][0], mime_type=images_data[5][1], data_base64=images_data[5][2]),
             etiquetas=["Vías"],
             georeference=GeoPoint(coordinates=lugares["6"]),
             titulo="Bache",
@@ -116,7 +115,6 @@ async def create_posts(users):
         Post(
             created_by=users[0],
             created_at=datetime.now(timezone.utc),
-            media=Image(filename=images_data[6][0], mime_type=images_data[6][1], data_base64=images_data[6][2]),
             etiquetas=["feminismo", "emprendimiento"],
             georeference=GeoPoint(coordinates=lugares["7"]),
             titulo="Conferencia Exponencialmente Conciente",
@@ -126,7 +124,6 @@ async def create_posts(users):
         Post(
             created_by=users[1],
             created_at=datetime.now(timezone.utc),
-            media=Image(filename=images_data[7][0], mime_type=images_data[7][1], data_base64=images_data[7][2]),
             etiquetas=["teatro", "CCi"],
             georeference=GeoPoint(coordinates=lugares["8"]),
             titulo="Terapia Integral",
@@ -136,7 +133,6 @@ async def create_posts(users):
         Post(
             created_by=users[2],
             created_at=datetime.now(timezone.utc),
-            media=Image(filename=images_data[8][0], mime_type=images_data[8][1], data_base64=images_data[8][2]),
             etiquetas=["tecnología", "emprendimiento"],
             georeference=GeoPoint(coordinates=lugares["9"]),
             titulo="Cultural",
@@ -146,7 +142,6 @@ async def create_posts(users):
         Post(
             created_by=users[0],
             created_at=datetime.now(timezone.utc),
-            media=Image(filename=images_data[9][0], mime_type=images_data[9][1], data_base64=images_data[9][2]),
             etiquetas=["anime", "k-pop"],
             georeference=GeoPoint(coordinates=lugares["10"]),
             titulo="Budokan",
@@ -154,13 +149,27 @@ async def create_posts(users):
             destacado=False,
         )
     ]
+    medias = [
+            Media(post=posts[0],media=Image(filename=images_data[0][0], mime_type=images_data[0][1], data_base64=images_data[0][2])),
+            Media(post=posts[1],media=Image(filename=images_data[1][0], mime_type=images_data[1][1], data_base64=images_data[1][2])),
+            Media(post=posts[2],media=Image(filename=images_data[2][0], mime_type=images_data[2][1], data_base64=images_data[2][2])),
+            Media(post=posts[3],media=Image(filename=images_data[3][0], mime_type=images_data[3][1], data_base64=images_data[3][2])),
+            Media(post=posts[4],media=Image(filename=images_data[4][0], mime_type=images_data[4][1], data_base64=images_data[4][2])),
+            Media(post=posts[5],media=Image(filename=images_data[5][0], mime_type=images_data[5][1], data_base64=images_data[5][2])),
+            Media(post=posts[6],media=Image(filename=images_data[6][0], mime_type=images_data[6][1], data_base64=images_data[6][2])),
+            Media(post=posts[7],media=Image(filename=images_data[7][0], mime_type=images_data[7][1], data_base64=images_data[7][2])),
+            Media(post=posts[8],media=Image(filename=images_data[8][0], mime_type=images_data[8][1], data_base64=images_data[8][2])),
+            Media(post=posts[9],media=Image(filename=images_data[9][0], mime_type=images_data[9][1], data_base64=images_data[9][2])),
+    ]
+
 
     await Post.insert_many(posts)
+    await Media.insert_many(medias)
 
 
 
 async def seed():
-    await init_beanie(database=db, document_models=[User, Post])
+    await init_beanie(database=db, document_models=[User, Post, Media])
     print("📦 Inicializando base de datos...")
 
     await User.delete_all()

@@ -6,3 +6,4 @@ pymongo[srv]
 python-jose
 beanie 
 motor
+pillow
