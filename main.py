@@ -7,7 +7,7 @@ import os
 from dotenv import load_dotenv
 from db import db
 from session import *
-from models import VerificationRequest , AuthRequest, User, Post, PostCreate, PayVerifyRequest
+from models import VerificationRequest , AuthRequest, User, Post, PostCreate, PayVerifyRequest, Media
 import asyncio
 from beanie import init_beanie
 from fastapi.middleware.cors import CORSMiddleware
@@ -135,6 +135,21 @@ async def obtener_posts_cercanos(
         results.append(Post(**doc))  # reconstruye como objetos Beanie
     return results
 
+@app.get("/posts/getMedia", response_model=Media)
+async def obtener_Media(
+    post_id: str
+):
+    try:
+        obj_id = ObjectId(post_id)
+    except:
+        raise HTTPException(status_code=400, detail="ID inválido")
+    await init_beanie(database=db,document_models=[User ,Post, Media])
+    # Ejecutar la agregación sobre la colección
+    p = await Post.get(obj_id)
+    media = await Media.find_one(Media.post == p)
+    
+    return media
+
 @app.post("/post/crear/{walletAddress}", status_code=201)
 async def crear_post(post_data: PostCreate, walletAddress: str, token: str = Depends(oauth2_scheme)):
     #payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -149,7 +164,6 @@ async def crear_post(post_data: PostCreate, walletAddress: str, token: str = Dep
     nuevo_post = Post(
         created_by=usuarioCreador,
         created_at=datetime.now(timezone.utc),
-        media=post_data.media,
         etiquetas=post_data.etiquetas,
         georeference=post_data.georeference,
         titulo=post_data.titulo,
@@ -157,6 +171,11 @@ async def crear_post(post_data: PostCreate, walletAddress: str, token: str = Dep
         destacado=False,
     )
     await nuevo_post.insert()
+    nueva_media = Media(
+        post = nuevo_post,
+        media = post_data.media
+    )
+    await nueva_media.insert()
     return {"message": "Post creado", "post_id": str(nuevo_post.id)}
 
 @app.post("/post/destacar/{post_id}", status_code=201)

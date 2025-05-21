@@ -56,7 +56,8 @@ async def create_users():
     await User.insert_many(users)
     return users
 
-async def create_posts(users):
+async def create_posts():
+    users = await User.all().to_list()
     posts = [
         Post(
             created_by=users[0],
@@ -149,6 +150,8 @@ async def create_posts(users):
             destacado=False,
         )
     ]
+    await Post.insert_many(posts)
+    posts = await Post.all().to_list()
     medias = [
             Media(post=posts[0],media=Image(filename=images_data[0][0], mime_type=images_data[0][1], data_base64=images_data[0][2])),
             Media(post=posts[1],media=Image(filename=images_data[1][0], mime_type=images_data[1][1], data_base64=images_data[1][2])),
@@ -163,7 +166,6 @@ async def create_posts(users):
     ]
 
 
-    await Post.insert_many(posts)
     await Media.insert_many(medias)
 
 
@@ -174,12 +176,13 @@ async def seed():
 
     await User.delete_all()
     await Post.delete_all()
+    await Media.delete_all()
 
     print("👥 Creando usuarios...")
     users = await create_users()
 
     print("📝 Creando posts...")
-    await create_posts(users)
+    await create_posts()
 
     print("✅ Datos de prueba insertados con éxito.")
     await db["posts"].create_index([("georeference", GEOSPHERE)])
