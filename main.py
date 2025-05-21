@@ -154,14 +154,16 @@ async def obtener_Media(
 async def crear_post(post_data: PostCreate, walletAddress: str, token: str = Depends(oauth2_scheme)):
     #payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
     #walletAddress: str = payload.get("walletAddress")
+    obj_id = ObjectId()
     if walletAddress is None:
         raise HTTPException(status_code=401, detail="Invalid token")
-    await init_beanie(database=db,document_models=[User, Post])
+    await init_beanie(database=db,document_models=[User, Post, Media])
     #Completa esta parte, busca el usuario por wallet
     usuarioCreador = await User.find_one(User.walletAddress == walletAddress)
     if usuarioCreador is None:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     nuevo_post = Post(
+        id= obj_id,
         created_by=usuarioCreador,
         created_at=datetime.now(timezone.utc),
         etiquetas=post_data.etiquetas,
